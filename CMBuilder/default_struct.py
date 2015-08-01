@@ -10,9 +10,9 @@ gtest_dir = '/home/midgard/Dropbox/project/gtest/gtest/'            # where gtes
 
 # How your project is organized
 folder_struct = {
-    'tests': FolderTypes.Tests,
+    'tests': FolderTypes.Tests,       # each source file in this folder will be added as a CMake test
     'src': FolderTypes.Library,       # all source file will be compiled inside a library name 'project_name'
-    'doc': FolderTypes.Doxygen,       # a new Folder will be created
+    'doc': FolderTypes.Doxygen,
     'build': FolderTypes.Build,
     'data': FolderTypes.Data
 }
@@ -34,20 +34,3 @@ file_config = {
 git_ignore = {
     'add': ['/build/']
 }
-
-
-# # How your project is organized
-# folder_struct = {
-#     FolderTypes.Tests: 'tests',
-#     FolderTypes.Library: 'src',       # all source file will be compiled inside a library name 'project_name'
-#     FolderTypes.Doxygen: 'doc',       # a new Folder will be created
-#     FolderTypes.Build: 'build',
-#     FolderTypes.Data: 'data'
-# }
-
-# dependencies = {
-#     'name': {
-#         'lib_path': '',
-#         'include_path': '',
-#     }
-# }

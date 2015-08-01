@@ -13,6 +13,7 @@ from CMBuilder.default_struct import *
 
 
 class CPPProject:
+    source_folder_name = str()
 
     def __init__(self):
 
@@ -64,18 +65,23 @@ class CPPProject:
             elif folder_struct[i] == FolderTypes.Library:
                 self.builder.code_source = self.project_path + i
                 self.cmake['src'] = open(self.project_path + i + '/CMakeLists.txt', 'w')
+                self.source_folder_name = i
                 self.root().write(self.builder.add_subdir(i))
             elif folder_struct[i] == FolderTypes.Doxygen:
                 self.builder.doc_source = self.project_path + i
 
     def write_tests(self):
-        self.tests().write(self.builder.include(project_name.upper() + '_HDS'))
+        self.tests().write(self.builder.include('../' + self.source_folder_name))
         self.tests().write(self.builder.config_test(gtest_dir, 'tests/', project_name))
 
     def write_src(self):
-        self.src().write(self.builder.include() + '\n')
+        # include header
+        # header are mixed with source by default
+        self.src().write(self.builder.include('.') + '\n')
+        # add everything as library source except file defined as mains
         self.src().write(self.builder.hadcore_folder('src/', project_name.upper() + '_SRC',
-                                                             project_name.upper() + '_HDS') + "\n\n")
+                                                             project_name.upper() + '_HDS',
+                                                     {i for i in mains}) + "\n\n")
 
         self.src().write(self.builder.add_library(project_name, [project_name.upper() + '_SRC',
                                                                 project_name.upper() + '_HDS']) + '\n')

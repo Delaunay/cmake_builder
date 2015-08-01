@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 __author__ = 'Pierre Delaunay'
-from utility import *
+from CMBuilder.utility import *
 from CMBuilder.Types import *
 
 
@@ -71,7 +71,7 @@ class CMakeBuilder:
         return "LIST(APPEND CMAKE_MODULE_PATH " + cmake_folder_path + ")"
 
     # add file one by one
-    def hadcore_folder(self, folder_name, var_src, var_hds=None):
+    def hadcore_folder(self, folder_name, var_src, var_hds=None, ignore_file=None):
         # if var_hds is set SRC and Header are separated
 
         if var_hds is None:
@@ -79,6 +79,9 @@ class CMakeBuilder:
             src += glob_recursive(self.project_path + folder_name, self.ext_hds())[1]
 
             self.cmake_var[var_src] = 1
+
+            if ignore_file is not None:
+                src = src.difference(ignore_file)
 
             return self.add_var(var_src, src)
         else:
@@ -88,13 +91,14 @@ class CMakeBuilder:
             self.cmake_var[var_src] = 1
             self.cmake_var[var_hds] = 1
 
+            if ignore_file is not None:
+                src = src.difference(ignore_file)
+                hds = hds.difference(ignore_file)
+
             return self.add_var(var_hds, hds) + '\n\n' + self.add_var(var_src, src)
             
-    def include(self, var = None):
-        #if var in self.cmake_var:
-        #    return 'INCLUDE_DIRECTORIES(${' + var + '})\n' 
-        #else:
-        return 'INCLUDE_DIRECTORIES(../src/)\n' 
+    def include(self, var=None):
+        return 'INCLUDE_DIRECTORIES(' + var + ')\n'
 
     # using CMake directory
     def add_src_folder(self, folder_name, var=None):
