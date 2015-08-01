@@ -1,0 +1,4 @@
+*.pyc
+project_test/build/
+*CMakeLists.txt*
+
