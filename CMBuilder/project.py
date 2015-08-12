@@ -9,9 +9,14 @@ from CMBuilder.cmake_builder import CMakeBuilder
 from CMBuilder.default_gitignore import *
 from CMBuilder.utility import *
 from CMBuilder.cmake import *
+from CMBuilder.default_struct import *
 
 # Overide defaults (TODO)
 # OVERIDE!
+
+configuration = ProjectConfig()
+# Shortcut
+conf = configuration
 
 
 class CPPProject:
@@ -24,18 +29,18 @@ class CPPProject:
             FileType.Test: '*_test.cpp'
         }
 
-        if project_folder[-1] != '/':
-            self.project_path = project_folder + '/' + project_name + '/'
+        if conf.project_folder[-1] != '/':
+            self.project_path = conf.project_folder + '/' + conf.project_name + '/'
         else:
-            self.project_path = project_folder + project_name + '/'
+            self.project_path = conf.project_folder + conf.project_name + '/'
 
         self.library = []
         self.tests_files = set()
 
         # CMake File
         self.builder = CMakeBuilder()
-        self.builder.file_config = file_config
-        self.builder.project_name = project_name
+        self.builder.file_config = conf.file_config
+        self.builder.project_name = conf.project_name
         self.builder.project_path = self.project_path
 
         # if project folder does not exist create it
@@ -58,18 +63,18 @@ class CPPProject:
 
     def create_folder_struct(self):
         # create a each defined folder
-        for i in folder_struct:
+        for i in conf.folder_struct:
             if not os.path.exists(self.project_path + i):
                 os.mkdir(self.project_path + i)
 
-            if folder_struct[i] == FolderTypes.Tests:
+            if conf.folder_struct[i] == FolderTypes.Tests:
                 self.builder.test_source = self.project_path + i
                 self.cmake['tests'] = open(self.project_path + i + '/CMakeLists.txt', 'w')
                 self.root().write(self.builder.add_subdir(i))
                 # src and hds found will be compiled into 'tests_utils' library
                 src, hds, tests = file_seeker(self.project_path + i, source=self.ext_src(), header=self.ext_hds(),
                                                                      test=self.ext_test())
-            elif folder_struct[i] == FolderTypes.Library:
+            elif conf.folder_struct[i] == FolderTypes.Library:
                 self.builder.code_source = self.project_path + i
                 self.cmake['src'] = open(self.project_path + i + '/CMakeLists.txt', 'w')
                 self.source_folder_name = i
@@ -84,26 +89,26 @@ class CPPProject:
                 lib.header_files = hds
                 lib.tests_files = test
 
-            elif folder_struct[i] == FolderTypes.Doxygen:
+            elif conf.folder_struct[i] == FolderTypes.Doxygen:
                 self.builder.doc_source = self.project_path + i
 
     def write_tests(self):
         self.tests().write(self.builder.include('../' + self.source_folder_name))
-        self.tests().write(self.builder.config_test(gtest_dir, 'tests/', project_name))
+        self.tests().write(self.builder.config_test(conf.gtest_dir, 'tests/', conf.project_name))
 
     def write_src(self):
         # include header
         # header are mixed with source by default
         self.src().write(self.builder.include('.') + '\n')
         # add everything as library source except file defined as mains
-        self.src().write(self.builder.hadcore_folder('src/', project_name.upper() + '_SRC',
-                                                             project_name.upper() + '_HDS',
-                                                     {i for i in mains}) + "\n\n")
+        self.src().write(self.builder.hadcore_folder('src/', conf.project_name.upper() + '_SRC',
+                                                             conf.project_name.upper() + '_HDS',
+                                                     {i for i in conf.mains}) + "\n\n")
 
-        self.src().write(self.builder.add_library(project_name, [project_name.upper() + '_SRC',
-                                                                project_name.upper() + '_HDS']) + '\n')
+        self.src().write(self.builder.add_library(conf.project_name, [conf.project_name.upper() + '_SRC',
+                                                                conf.project_name.upper() + '_HDS']) + '\n')
 
-        self.src().write(self.builder.add_mains(mains, [project_name]))
+        self.src().write(self.builder.add_mains(conf.mains, [conf.project_name]))
 
     def add_gitignore(self):
         # create gitignore
@@ -112,8 +117,8 @@ class CPPProject:
             git_ignore_f.write(default_gitignore)
 
             # add specified rule
-            if 'add' in git_ignore:
-                for i in git_ignore['add']:
+            if 'add' in conf.git_ignore:
+                for i in conf.git_ignore['add']:
                     git_ignore_f.write(i + '\n')
 
             git_ignore_f.close()
@@ -121,7 +126,7 @@ class CPPProject:
     def add_readme(self):
         if not os.path.exists(self.project_path + 'README.md'):
             readme = open(self.project_path + 'README.md', 'a')
-            readme.write(project_name + '\n' + '=' * len(project_name))
+            readme.write(conf.project_name + '\n' + '=' * len(conf.project_name))
             readme.close()
 
     def add_cmakelists(self):

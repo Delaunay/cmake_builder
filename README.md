@@ -8,11 +8,10 @@ Directory creation with basic CMake config
 * config testing using gtest
 * Sources are built as lib
 
-
 Usage:
 ------
 
-
+./python3 cpp_project.py project_name
 
 TODO:
 -----
