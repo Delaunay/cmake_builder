@@ -32,5 +32,5 @@ file_config = {
 
 # add definition to the default gitignore
 git_ignore = {
-    'add': ['/build/']
+    'add': ['/build*/']
 }

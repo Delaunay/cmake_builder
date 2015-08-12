@@ -7,12 +7,12 @@ from CMBuilder.Types import *
 class CMakeBuilder:
     # create a fairly standard cpp CMake file which follow a fairly standard directory setup
     #   |project_name/
-    #   |||||+-----CMakeLists.txt
-    #   ||||+------/src
-    #   |||+-------/doc
-    #   ||+--------/test
-    #   |+---------/data
-    #   +----------/build-release ...
+    #   | | | | | +--- CMakeLists.txt
+    #   | | | | +-----/src
+    #   | | | +-------/doc
+    #   | | +---------/test
+    #   | +-----------/data
+    #   +-------------/build-release ...
     # gtest as unit testing framework
     # CMake builder build your cpp project as a library
     # your main is then build using that library
@@ -49,7 +49,7 @@ class CMakeBuilder:
     def cmake_head(self, major=0, minor=0, patch=0):
         s = "PROJECT(" + self.project_name + ")\n" +\
             "CMAKE_MINIMUM_REQUIRED(VERSION 2.8.4)\n" +\
-            "SET(CMAKE_CXX_FLAGS \"${CMAKE_CXX_FLAGS} -std=c++11 \")\n\n" +\
+            "SET(CMAKE_CXX_FLAGS \"${CMAKE_CXX_FLAGS} -std=c++11\")\n\n" +\
             \
             "SET(CMAKE_RELEASE_POSTFIX \"\")\n" +\
             "SET(CMAKE_DEBUG_POSTFIX \"-debug\")\n" +\

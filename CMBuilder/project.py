@@ -1,12 +1,14 @@
 # -*- coding: utf-8 -*-
 __author__ = 'Pierre Delaunay'
+
 import os
 import glob
 from CMBuilder.cmake_builder import CMakeBuilder
 
 # load defaults
 from CMBuilder.default_gitignore import *
-from CMBuilder.default_struct import *
+from CMBuilder.utility import *
+from CMBuilder.cmake import *
 
 # Overide defaults (TODO)
 # OVERIDE!
@@ -16,21 +18,23 @@ class CPPProject:
     source_folder_name = str()
 
     def __init__(self):
-
-        # CMake File
-        self.builder = CMakeBuilder()
-        self.builder.file_config = file_config
-
-        if 'tests' in folder_struct or FileType.Test in file_config:
-            self.testing = True
-        else:
-            self.testing = False
+        self.file_config = {
+            FileType.Header: '*h',
+            FileType.Source: '*cpp',
+            FileType.Test: '*_test.cpp'
+        }
 
         if project_folder[-1] != '/':
             self.project_path = project_folder + '/' + project_name + '/'
         else:
             self.project_path = project_folder + project_name + '/'
 
+        self.library = []
+        self.tests_files = set()
+
+        # CMake File
+        self.builder = CMakeBuilder()
+        self.builder.file_config = file_config
         self.builder.project_name = project_name
         self.builder.project_path = self.project_path
 
@@ -62,11 +66,24 @@ class CPPProject:
                 self.builder.test_source = self.project_path + i
                 self.cmake['tests'] = open(self.project_path + i + '/CMakeLists.txt', 'w')
                 self.root().write(self.builder.add_subdir(i))
+                # src and hds found will be compiled into 'tests_utils' library
+                src, hds, tests = file_seeker(self.project_path + i, source=self.ext_src(), header=self.ext_hds(),
+                                                                     test=self.ext_test())
             elif folder_struct[i] == FolderTypes.Library:
                 self.builder.code_source = self.project_path + i
                 self.cmake['src'] = open(self.project_path + i + '/CMakeLists.txt', 'w')
                 self.source_folder_name = i
                 self.root().write(self.builder.add_subdir(i))
+
+                src, hds, tests = file_seeker(self.project_path + i, source=self.ext_src(), header=self.ext_hds(), test=self.ext_test())
+
+                lib = Library()
+                lib.name = i.split('/')[-1]     # explode url and use last folder as library name
+                lib.path = self.project_path + i
+                lib.source_files = src
+                lib.header_files = hds
+                lib.tests_files = test
+
             elif folder_struct[i] == FolderTypes.Doxygen:
                 self.builder.doc_source = self.project_path + i
 
@@ -136,5 +153,12 @@ class CPPProject:
         instance.cmake['src'].close()
         instance.cmake['test'].close()
 
+    def ext_hds(self):
+        return self.file_config[FileType.Header]
 
-CPPProject()
+    def ext_src(self):
+        return self.file_config[FileType.Source]
+
+    def ext_test(self):
+        return self.file_config[FileType.Test]
+

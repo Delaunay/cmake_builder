@@ -3,6 +3,14 @@ __author__ = 'Pierre Delaunay'
 
 from CMBuilder.project import CPPProject
 
+# Import default configuration
+from CMBuilder.default_struct import *
 
-# if __name__ == '__main__':
-#     a = CPPProject('.', 'project_test')
+
+# Read Provided configuration
+
+
+
+
+# Create the project
+CPPProject()

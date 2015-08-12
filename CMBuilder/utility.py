@@ -3,7 +3,6 @@ __author__ = 'Pierre Delaunay'
 
 #   Quick and dirty utilities
 #       file name will not have more than one '.'
-#       file has an extension
 #       folder name will never have one or more '.'
 #       file/folder are loaded as Set
 import glob
@@ -29,7 +28,7 @@ def glob_file(path, pattern, folder=''):
 def glob_recursive(path, pattern, folder=''):
 
     fold_ = glob_folder(path, '*', folder)      # <= we want all the folder
-    file_ = glob_file(path, pattern, folder)    # <= we want only file matching pattern
+    file_ = glob_file(path, pattern, folder)    # <= we want only file matching 'pattern'
 
     for i in fold_:
         fo, fi = glob_recursive(path + folder, pattern, i + '/')
@@ -38,3 +37,12 @@ def glob_recursive(path, pattern, folder=''):
         file_ = file_.union(fi)
 
     return fold_, file_
+
+
+def file_seeker(seek_path, source='*.cpp', header='*.h', test='*_test.h'):
+
+    test_files = glob_recursive(seek_path, test)[1]
+    source_files = glob_recursive(seek_path, source)[1]
+    header_files = glob_recursive(seek_path, header)[1]
+
+    return source_files, header_files, test_files
