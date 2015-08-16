@@ -7,7 +7,6 @@ from CMBuilder.project import CPPProject, configuration
 import sys
 args = sys.argv
 
-
 # Read project name
 if len(args) > 1:
 
